@@ -6,31 +6,29 @@
     <title>Pixel Picks - Shop</title>
     <style>
         :root { --primary: #25d366; --dark: #1a1a1a; --gray: #f4f4f4; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--gray); text-align: center; }
+        body { font-family: sans-serif; margin: 0; background: var(--gray); text-align: center; }
         header { background: var(--dark); color: white; padding: 15px; display: flex; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .back-btn { color: white; text-decoration: none; font-size: 24px; margin-right: 20px; }
         
         .product-grid { display: flex; flex-wrap: wrap; justify-content: center; padding: 15px; }
         .card { background: white; width: 300px; margin: 15px; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); position: relative; }
         
-        /* Image Slider Style */
+        /* Image Slider */
         .slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; height: 250px; background: #eee; }
         .slider img { width: 100%; height: 100%; object-fit: cover; flex-shrink: 0; scroll-snap-align: start; }
-        .slider::-webkit-scrollbar { height: 4px; }
-        .slider::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-
+        
         .details { padding: 15px; text-align: left; }
         .price { font-size: 22px; color: #e44d26; font-weight: bold; }
         .size { background: #e1e1e1; padding: 2px 8px; border-radius: 4px; font-size: 13px; font-weight: bold; }
         .order-btn { display: block; background: var(--primary); color: white; text-align: center; padding: 12px; text-decoration: none; border-radius: 8px; margin-top: 10px; font-weight: bold; }
         
-        .admin-controls { position: absolute; top: 10px; right: 10px; display: none; }
-        .edit-btn { background: rgba(0,0,0,0.7); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        /* Admin controls - എപ്പോഴും കാണും, പക്ഷെ ക്ലിക്ക് ചെയ്താൽ പാസ്‌വേഡ് ചോദിക്കും */
+        .admin-controls { position: absolute; top: 10px; right: 10px; z-index: 10; }
+        .edit-btn { background: rgba(0,0,0,0.7); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-left: 5px; }
 
-        /* Admin Form */
         #admin-panel { display: none; background: white; max-width: 400px; margin: 20px auto; padding: 20px; border-radius: 15px; box-shadow: 0 0 20px rgba(0,0,0,0.1); text-align: left; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        #login-btn { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 20px; cursor: pointer; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        #login-trigger { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -41,33 +39,29 @@
 </header>
 
 <div class="product-grid" id="container">
-    <p id="empty-msg">പ്രോഡക്റ്റുകൾ ഒന്നുമില്ല. അഡ്മിൻ ലോഗിൻ ചെയ്ത് ചേർക്കുക.</p>
-</div>
+    </div>
 
-<button id="login-btn" onclick="openAdmin()">Admin Login</button>
+<button id="login-trigger" onclick="adminLogin()">Admin Login (Add Products)</button>
 
 <div id="admin-panel">
     <h3 style="text-align:center">Add New Product</h3>
     <input type="hidden" id="edit-id">
-    <input type="text" id="pName" placeholder="Product Name (ഉദാ: ബ്ലാക്ക് ഷർട്ട്)">
+    <input type="text" id="pName" placeholder="Product Name">
     <input type="number" id="pPrice" placeholder="Price (₹)">
-    <input type="text" id="pSize" placeholder="Available Sizes (S, M, L, XL)">
-    <label>Select Images (Max 6):</label>
+    <input type="text" id="pSize" placeholder="Sizes (S, M, L, XL)">
     <input type="file" id="pImages" multiple accept="image/*">
     <button onclick="saveData()" style="width:100%; background:#007bff; color:white; padding:15px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Save Product</button>
 </div>
 
 <script>
     let productList = JSON.parse(localStorage.getItem('myProducts')) || [];
-    let showAdminBtns = false;
 
-    function openAdmin() {
-        let p = prompt("Password നൽകുക:");
+    // അഡ്മിൻ ലോഗിൻ ഫങ്ക്ഷൻ
+    function adminLogin() {
+        let p = prompt("Admin Password നൽകുക:");
         if(p === "2362009") {
             document.getElementById('admin-panel').style.display = 'block';
-            document.getElementById('login-btn').style.display = 'none';
-            showAdminBtns = true;
-            renderProducts();
+            document.getElementById('login-trigger').style.display = 'none';
         } else { alert("Wrong Password!"); }
     }
 
@@ -94,47 +88,58 @@
 
         localStorage.setItem('myProducts', JSON.stringify(productList));
         renderProducts();
+        document.getElementById('admin-panel').style.display = 'none';
+        document.getElementById('login-trigger').style.display = 'block';
         clearForm();
     }
 
     function renderProducts() {
         const cont = document.getElementById('container');
-        cont.innerHTML = productList.length ? "" : '<p>പ്രോഡക്റ്റുകൾ ഒന്നുമില്ല.</p>';
+        cont.innerHTML = productList.length ? "" : '<p>നിലവിൽ പ്രോഡക്റ്റുകൾ ഒന്നുമില്ല.</p>';
 
         productList.forEach((p, index) => {
             let imgs = p.images.map(i => `<img src="${i}">`).join('');
             cont.innerHTML += `
                 <div class="card">
-                    <div class="admin-controls" style="display:${showAdminBtns?'block':'none'}">
-                        <button class="edit-btn" onclick="editProd(${index})">Edit</button>
-                        <button class="edit-btn" style="background:red" onclick="deleteProd(${index})">X</button>
+                    <div class="admin-controls">
+                        <button class="edit-btn" onclick="secureEdit(${index})">Edit</button>
+                        <button class="edit-btn" style="background:red" onclick="secureDelete(${index})">X</button>
                     </div>
                     <div class="slider">${imgs}</div>
                     <div class="details">
-                        <span class="size">${p.size || 'All Sizes'}</span>
+                        <span class="size">${p.size || 'Free Size'}</span>
                         <h3>${p.name}</h3>
                         <div class="price">₹${p.price}</div>
-                        <a href="https://wa.me/91XXXXXXXXXX?text=I want to buy ${p.name}" class="order-btn">Order on WhatsApp</a>
+                        <a href="https://wa.me/916238219175?text=Order: ${p.name}" class="order-btn">Order on WhatsApp</a>
                     </div>
                 </div>
             `;
         });
     }
 
-    function editProd(i) {
-        document.getElementById('pName').value = productList[i].name;
-        document.getElementById('pPrice').value = productList[i].price;
-        document.getElementById('pSize').value = productList[i].size;
-        document.getElementById('edit-id').value = i;
-        window.scrollTo(0, document.body.scrollHeight);
+    // എഡിറ്റ് ചെയ്യുമ്പോൾ പാസ്‌വേഡ് ചോദിക്കാൻ
+    function secureEdit(i) {
+        let p = prompt("മാറ്റം വരുത്താൻ പാസ്‌വേഡ് നൽകുക:");
+        if(p === "1234") {
+            document.getElementById('admin-panel').style.display = 'block';
+            document.getElementById('pName').value = productList[i].name;
+            document.getElementById('pPrice').value = productList[i].price;
+            document.getElementById('pSize').value = productList[i].size;
+            document.getElementById('edit-id').value = i;
+            window.scrollTo(0, document.body.scrollHeight);
+        } else { alert("തെറ്റായ പാസ്‌വേഡ്!"); }
     }
 
-    function deleteProd(i) {
-        if(confirm("Delete ചെയ്യണോ?")) {
-            productList.splice(i, 1);
-            localStorage.setItem('myProducts', JSON.stringify(productList));
-            renderProducts();
-        }
+    // ഡിലീറ്റ് ചെയ്യുമ്പോൾ പാസ്‌വേഡ് ചോദിക്കാൻ
+    function secureDelete(i) {
+        let p = prompt("ഡിലീറ്റ് ചെയ്യാൻ പാസ്‌വേഡ് നൽകുക:");
+        if(p === "1234") {
+            if(confirm("ഈ പ്രോഡക്റ്റ് നീക്കം ചെയ്യണോ?")) {
+                productList.splice(i, 1);
+                localStorage.setItem('myProducts', JSON.stringify(productList));
+                renderProducts();
+            }
+        } else { alert("തെറ്റായ പാസ്‌വേഡ്!"); }
     }
 
     function clearForm() {
