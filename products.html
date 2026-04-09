@@ -5,51 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products - Pixel Picks</title>
     <style>
-        body { font-family: Arial; text-align: center; background: #f4f4f4; margin: 0; }
-        header { background: #1a1a1a; color: white; padding: 20px; }
-        .product-grid { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; }
-        .card { background: white; padding: 15px; margin: 15px; border-radius: 10px; width: 250px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .card img { width: 100%; border-radius: 10px; }
+        body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f4; margin: 0; }
+        header { background: #1a1a1a; color: white; padding: 20px; text-align: left; }
+        .product-grid { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; min-height: 200px; }
+        .card { background: white; padding: 15px; margin: 15px; border-radius: 10px; width: 250px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
+        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
+        .order-btn { background: #25d366; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; }
         
-        /* Admin ബട്ടൺ സ്റ്റൈൽ */
-        #admin-btn { background: #555; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        #add-product-section { display: none; background: #ddd; padding: 20px; margin: 20px; border-radius: 10px; }
-        
-        .order-btn { background: #25d366; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        #admin-btn { background: #555; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 20px; }
+        #add-product-section { display: none; background: #fff; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 400px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: left; }
+        #add-product-section input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .back-link { color: white; text-decoration: none; font-size: 18px; margin-right: 15px; }
     </style>
 </head>
 <body>
 
 <header>
-    <a href="index.html" style="color: white; float: left; text-decoration: none;">← Back</a>
-    <h2>Our Products</h2>
+    <a href="index.html" class="back-link">←</a>
+    <h2 style="display: inline;">Our Products</h2>
 </header>
 
 <div class="product-grid" id="product-container">
-    <div class="card">
-        <h3>Sample Product</h3>
-        <p>Price: ₹499</p>
-        <button class="order-btn">Order Now</button>
-    </div>
+    <p id="no-products" style="color: #888;">നിലവിൽ പ്രോഡക്റ്റുകൾ ഒന്നുമില്ല. അഡ്മിൻ ലോഗിൻ ചെയ്ത് ആഡ് ചെയ്യുക.</p>
 </div>
 
 <hr>
 
-<button id="admin-btn" onclick="checkPassword()">Admin Login (To Add Products)</button>
+<button id="admin-btn" onclick="checkPassword()">Admin Login</button>
 
 <div id="add-product-section">
-    <h3>Add New Product</h3>
-    <input type="text" id="pName" placeholder="Product Name"><br><br>
-    <input type="text" id="pPrice" placeholder="Price"><br><br>
-    <button onclick="addNewProduct()" style="background: blue; color: white; padding: 10px;">Add to List</button>
+    <h3 style="text-align: center;">Add New Product</h3>
+    
+    <label>Product Name:</label>
+    <input type="text" id="pName" placeholder="ഉദാ: Men's Watch">
+    
+    <label>Price (₹):</label>
+    <input type="number" id="pPrice" placeholder="ഉദാ: 999">
+    
+    <label>Select Photo:</label>
+    <input type="file" id="pPhotoFile" accept="image/*">
+    
+    <button onclick="addNewProduct()" style="width: 100%; background: #007bff; color: white; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px;">Add Product</button>
 </div>
 
 <script>
-    // പാസ്‌വേഡ് പരിശോധിക്കാനുള്ള ഫങ്ക്ഷൻ
+    // പാസ്‌വേഡ് പരിശോധന (ഇവിടെ 1234 എന്നത് നിങ്ങൾക്ക് മാറ്റാം)
     function checkPassword() {
-        var password = prompt("ദയവായി അഡ്മിൻ പാസ്‌വേഡ് നൽകുക:");
-        if (password === "2009") { // ഇവിടെ നിങ്ങൾക്ക് ഇഷ്ടമുള്ള പാസ്‌വേഡ് നൽകാം
-            alert("Password Correct!");
+        var password = prompt("Admin Password നൽകുക:");
+        if (password === "1234") { 
             document.getElementById('add-product-section').style.display = 'block';
             document.getElementById('admin-btn').style.display = 'none';
         } else {
@@ -57,29 +60,38 @@
         }
     }
 
-    // പ്രോഡക്റ്റ് താൽക്കാലികമായി ആഡ് ചെയ്യാൻ
     function addNewProduct() {
         var name = document.getElementById('pName').value;
         var price = document.getElementById('pPrice').value;
+        var photoFile = document.getElementById('pPhotoFile').files[0];
         
-        if(name == "" || price == "") {
-            alert("വിവരങ്ങൾ കൃത്യമായി നൽകുക");
+        if(!name || !price || !photoFile) {
+            alert("എല്ലാ വിവരങ്ങളും നൽകുക!");
             return;
         }
 
-        var container = document.getElementById('product-container');
-        var newCard = `
-            <div class="card">
-                <h3>${name}</h3>
-                <p>Price: ₹${price}</p>
-                <button class="order-btn">Order Now</button>
-            </div>
-        `;
-        container.innerHTML += newCard;
-        
-        // ബോക്സുകൾ ക്ലിയർ ചെയ്യാൻ
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            // "പ്രോഡക്റ്റുകൾ ഒന്നുമില്ല" എന്ന എഴുത്ത് മാറ്റാൻ
+            document.getElementById('no-products').style.display = 'none';
+
+            var container = document.getElementById('product-container');
+            var newCard = `
+                <div class="card">
+                    <img src="${e.target.result}" alt="${name}">
+                    <h3>${name}</h3>
+                    <p style="color: green; font-weight: bold;">Price: ₹${price}</p>
+                    <a href="https://wa.me/916238219175?text=I want to buy ${name}" class="order-btn">Order on WhatsApp</a>
+                </div>
+            `;
+            container.innerHTML += newCard;
+        };
+        reader.readAsDataURL(photoFile);
+
+        // ഇൻപുട്ട് ക്ലിയർ ചെയ്യാൻ
         document.getElementById('pName').value = "";
         document.getElementById('pPrice').value = "";
+        document.getElementById('pPhotoFile').value = "";
     }
 </script>
 
