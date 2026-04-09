@@ -3,31 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Products - Pixel Picks</title>
+    <title>Products - Pixel Picks</title>
     <style>
-        body { font-family: Arial; text-align: center; background: #f9f9f9; margin: 0; }
+        body { font-family: Arial; text-align: center; background: #f4f4f4; margin: 0; }
         header { background: #1a1a1a; color: white; padding: 20px; }
-        .back-btn { color: white; text-decoration: none; font-size: 14px; float: left; }
         .product-grid { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; }
         .card { background: white; padding: 15px; margin: 15px; border-radius: 10px; width: 250px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .card img { width: 100%; border-radius: 10px; }
-        .order-btn { background: #ff9900; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        
+        /* Admin ബട്ടൺ സ്റ്റൈൽ */
+        #admin-btn { background: #555; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        #add-product-section { display: none; background: #ddd; padding: 20px; margin: 20px; border-radius: 10px; }
+        
+        .order-btn { background: #25d366; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
-    <header>
-        <a href="index.html" class="back-btn">← Back</a>
-        <h2>Our Products</h2>
-    </header>
 
-    <div class="product-grid">
-        <div class="card">
-            <img src="shirt.jpg" alt="Product">
-            <h3>Premium Men's Shirt</h3>
-            <p>വില: ₹499</p>
-            <button class="order-btn" onclick="location.href='https://wa.me/916238219175?text=I want to order this shirt'">Order on WhatsApp</button>
-        </div>
+<header>
+    <a href="index.html" style="color: white; float: left; text-decoration: none;">← Back</a>
+    <h2>Our Products</h2>
+</header>
+
+<div class="product-grid" id="product-container">
+    <div class="card">
+        <h3>Sample Product</h3>
+        <p>Price: ₹499</p>
+        <button class="order-btn">Order Now</button>
+    </div>
+</div>
+
+<hr>
+
+<button id="admin-btn" onclick="checkPassword()">Admin Login (To Add Products)</button>
+
+<div id="add-product-section">
+    <h3>Add New Product</h3>
+    <input type="text" id="pName" placeholder="Product Name"><br><br>
+    <input type="text" id="pPrice" placeholder="Price"><br><br>
+    <button onclick="addNewProduct()" style="background: blue; color: white; padding: 10px;">Add to List</button>
+</div>
+
+<script>
+    // പാസ്‌വേഡ് പരിശോധിക്കാനുള്ള ഫങ്ക്ഷൻ
+    function checkPassword() {
+        var password = prompt("ദയവായി അഡ്മിൻ പാസ്‌വേഡ് നൽകുക:");
+        if (password === "2009") { // ഇവിടെ നിങ്ങൾക്ക് ഇഷ്ടമുള്ള പാസ്‌വേഡ് നൽകാം
+            alert("Password Correct!");
+            document.getElementById('add-product-section').style.display = 'block';
+            document.getElementById('admin-btn').style.display = 'none';
+        } else {
+            alert("തെറ്റായ പാസ്‌വേഡ്!");
+        }
+    }
+
+    // പ്രോഡക്റ്റ് താൽക്കാലികമായി ആഡ് ചെയ്യാൻ
+    function addNewProduct() {
+        var name = document.getElementById('pName').value;
+        var price = document.getElementById('pPrice').value;
         
-        </div>
+        if(name == "" || price == "") {
+            alert("വിവരങ്ങൾ കൃത്യമായി നൽകുക");
+            return;
+        }
+
+        var container = document.getElementById('product-container');
+        var newCard = `
+            <div class="card">
+                <h3>${name}</h3>
+                <p>Price: ₹${price}</p>
+                <button class="order-btn">Order Now</button>
+            </div>
+        `;
+        container.innerHTML += newCard;
+        
+        // ബോക്സുകൾ ക്ലിയർ ചെയ്യാൻ
+        document.getElementById('pName').value = "";
+        document.getElementById('pPrice').value = "";
+    }
+</script>
+
 </body>
 </html>
