@@ -3,100 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products - Pixel Picks</title>
+    <title>Pixel Picks - Products</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f4; margin: 0; }
-        header { background: #1a1a1a; color: white; padding: 20px; text-align: left; }
-        .product-grid { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; min-height: 200px; }
-        .card { background: white; padding: 15px; margin: 15px; border-radius: 10px; width: 250px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
-        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
-        .order-btn { background: #25d366; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; }
+        body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f4; margin: 0; padding-bottom: 50px; }
+        header { background: #1a1a1a; color: white; padding: 20px; text-align: left; position: sticky; top: 0; z-index: 100; }
+        .product-grid { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 15px; margin: 15px; border-radius: 12px; width: 280px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; }
         
-        #admin-btn { background: #555; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 20px; }
-        #add-product-section { display: none; background: #fff; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 400px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: left; }
-        #add-product-section input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        .back-link { color: white; text-decoration: none; font-size: 18px; margin-right: 15px; }
+        /* ഒന്നിലധികം ഫോട്ടോകൾ കാണിക്കാൻ */
+        .img-container { display: flex; overflow-x: auto; gap: 5px; scroll-snap-type: x mandatory; margin-bottom: 10px; border-radius: 8px; }
+        .img-container img { width: 100%; height: 200px; object-fit: cover; scroll-snap-align: start; flex-shrink: 0; }
+        
+        .size-tag { background: #eee; padding: 5px 10px; border-radius: 4px; font-size: 14px; font-weight: bold; }
+        .price { color: #e44d26; font-size: 20px; font-weight: bold; margin: 10px 0; }
+        .order-btn { background: #25d366; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; text-decoration: none; display: block; }
+        
+        /* Edit Button */
+        .edit-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; display: none; }
+
+        /* Admin Panel */
+        #admin-btn { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 20px; }
+        #add-product-section { display: none; background: white; padding: 25px; margin: 20px auto; max-width: 450px; border-radius: 15px; box-shadow: 0 0 20px rgba(0,0,0,0.2); text-align: left; }
+        #add-product-section input, #add-product-section select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <header>
-    <a href="index.html" class="back-link">←</a>
-    <h2 style="display: inline;">Our Products</h2>
+    <a href="index.html" style="color: white; text-decoration: none; font-size: 20px;">←</a>
+    <h2 style="display: inline; margin-left: 20px;">Pixel Picks Products</h2>
 </header>
 
 <div class="product-grid" id="product-container">
-    <p id="no-products" style="color: #888;">നിലവിൽ പ്രോഡക്റ്റുകൾ ഒന്നുമില്ല. അഡ്മിൻ ലോഗിൻ ചെയ്ത് ആഡ് ചെയ്യുക.</p>
+    <p id="no-products">പ്രോഡക്റ്റുകൾ ഒന്നുമില്ല.</p>
 </div>
 
-<hr>
-
-<button id="admin-btn" onclick="checkPassword()">Admin Login</button>
+<button id="admin-btn" onclick="checkPassword()">Admin Panel</button>
 
 <div id="add-product-section">
-    <h3 style="text-align: center;">Add New Product</h3>
+    <h3 style="text-align: center;">Add/Edit Product</h3>
+    <input type="hidden" id="edit-index">
+    <input type="text" id="pName" placeholder="Product Name">
+    <input type="number" id="pPrice" placeholder="Price (₹)">
+    <input type="text" id="pSize" placeholder="Sizes (Ex: S, M, L, XL)">
+    <label>Select Multiple Photos (Up to 6):</label>
+    <input type="file" id="pPhotos" accept="image/*" multiple>
     
-    <label>Product Name:</label>
-    <input type="text" id="pName" placeholder="ഉദാ: Men's Watch">
-    
-    <label>Price (₹):</label>
-    <input type="number" id="pPrice" placeholder="ഉദാ: 999">
-    
-    <label>Select Photo:</label>
-    <input type="file" id="pPhotoFile" accept="image/*">
-    
-    <button onclick="addNewProduct()" style="width: 100%; background: #007bff; color: white; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px;">Add Product</button>
+    <button onclick="saveProduct()" id="save-btn" style="width: 100%; background: #007bff; color: white; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Save Product</button>
 </div>
 
 <script>
-    // പാസ്‌വേഡ് പരിശോധന (ഇവിടെ 1234 എന്നത് നിങ്ങൾക്ക് മാറ്റാം)
+    let products = [];
+    let isAdmin = false;
+
     function checkPassword() {
-        var password = prompt("Admin Password നൽകുക:");
-        if (password === "2362009") { 
+        let pass = prompt("Admin Password നൽകുക:");
+        if (pass === "2362009") {
+            isAdmin = true;
             document.getElementById('add-product-section').style.display = 'block';
             document.getElementById('admin-btn').style.display = 'none';
+            showProducts(); // എഡിറ്റ് ബട്ടൺ കാണിക്കാൻ വേണ്ടി ഒന്നുകൂടി ലോഡ് ചെയ്യുന്നു
         } else {
             alert("തെറ്റായ പാസ്‌വേഡ്!");
         }
     }
 
-    function addNewProduct() {
-        var name = document.getElementById('pName').value;
-        var price = document.getElementById('pPrice').value;
-        var photoFile = document.getElementById('pPhotoFile').files[0];
-        
-        if(!name || !price || !photoFile) {
-            alert("എല്ലാ വിവരങ്ങളും നൽകുക!");
+    async function saveProduct() {
+        const name = document.getElementById('pName').value;
+        const price = document.getElementById('pPrice').value;
+        const size = document.getElementById('pSize').value;
+        const files = document.getElementById('pPhotos').files;
+        const editIndex = document.getElementById('edit-index').value;
+
+        if (!name || !price || (!files.length && editIndex === "")) {
+            alert("വിവരങ്ങൾ പൂർണ്ണമായി നൽകുക!");
             return;
         }
 
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            // "പ്രോഡക്റ്റുകൾ ഒന്നുമില്ല" എന്ന എഴുത്ത് മാറ്റാൻ
-            document.getElementById('no-products').style.display = 'none';
+        let photoURLs = [];
+        if (files.length > 0) {
+            for (let file of files) {
+                const base64 = await toBase64(file);
+                photoURLs.push(base64);
+            }
+        }
 
-            var container = document.getElementById('product-container');
-            var newCard = `
-                <div class="card">
-                    <img src="${e.target.result}" alt="${name}">
-                    <h3>${name}</h3>
-                    <p style="color: green; font-weight: bold;">Price: ₹${price}</p>
-                    <a href="https://wa.me/916238219175?text=I want to buy ${name}" class="order-btn">Order on WhatsApp</a>
-                </div>
-            `;
-            container.innerHTML += newCard;
-        };
-        reader.readAsDataURL(photoFile);
-
-        // ഇൻപുട്ട് ക്ലിയർ ചെയ്യാൻ
-        document.getElementById('pName').value = "";
-        document.getElementById('pPrice').value = "";
-        document.getElementById('pPhotoFile').value = "";
-    }
-// "പ്രോഡക്റ്റുകൾ ഒന്നുമില്ല" എന്ന എഴുത്ത് മാറ്റാൻ
-document.getElementById('no-products').style.display = 'none';
-
-</script>
-
-</body>
-</html>
+        const productData = { name, price, size, photos: photoURLs.length > 0 ? photoURLs : (editIndex !== "" ? products
